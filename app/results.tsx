@@ -44,6 +44,7 @@ export default function ResultsScreen() {
   const { zip, lat, lon } = useLocalSearchParams();
   const [weather, setWeather] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [isSaved, setIsSaved] = useState(false);
   const [units, setUnits] = useState<'imperial' | 'metric'>('imperial');
   const router = useRouter();
@@ -58,6 +59,7 @@ export default function ResultsScreen() {
   const fetchWeather = async (activeUnits = units) => {
     const apiKey = process.env.EXPO_PUBLIC_WEATHER_API_KEY;
     setLoading(true);
+    setError(null);
     try {
       let url = `https://api.openweathermap.org/data/2.5/weather?units=${activeUnits}&appid=${apiKey}`;
       if (zip) url += `&zip=${zip},us`;
@@ -74,9 +76,9 @@ export default function ResultsScreen() {
           setIsSaved(list.some((f: any) => f.name === data.name));
         }
       } else {
-        Alert.alert("Error", data.message || "Location not found", [{ text: "Go Back", onPress: () => router.back() }]);
+        setError(data.message || 'Location not found');
       }
-    } catch (e) { Alert.alert("Error", "Network failed"); }
+    } catch (e) { setError('Network request failed. Check your connection.'); }
     finally { setLoading(false); }
   };
 
@@ -132,7 +134,20 @@ export default function ResultsScreen() {
     return { icon: 'tshirt-crew', value: 'Light Layers' };
   };
 
-  if (loading && !weather) {
+  if (loading || !weather) {
+    if (error) {
+      return (
+        <View style={[styles.centered, { backgroundColor: '#0f172a' }]}>
+          <Icons.MaterialCommunityIcons name="alert-circle-outline" size={60} color="rgba(255,255,255,0.4)" />
+          <Text style={{ color: '#fff', fontSize: 18, fontWeight: 'bold', marginTop: 16, textAlign: 'center', paddingHorizontal: 30 }}>
+            {error}
+          </Text>
+          <TouchableOpacity onPress={() => router.back()} style={{ marginTop: 28, backgroundColor: 'rgba(255,255,255,0.1)', paddingHorizontal: 30, paddingVertical: 14, borderRadius: 16, borderWidth: 1, borderColor: 'rgba(255,255,255,0.2)' }}>
+            <Text style={{ color: '#fff', fontWeight: 'bold', fontSize: 15 }}>Go Back</Text>
+          </TouchableOpacity>
+        </View>
+      );
+    }
     return (
       <View style={styles.centered}>
         <ActivityIndicator size="large" color="#fff" />
