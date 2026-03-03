@@ -4,10 +4,10 @@ import Parse from 'parse/react-native';
 Parse.setAsyncStorage(AsyncStorage);
 
 Parse.initialize(
-  process.env.EXPO_PUBLIC_BACK4APP_APP_ID!,
-  process.env.EXPO_PUBLIC_BACK4APP_JS_KEY!
+  'ZwEcmgfjHiQXGDLKeq4m0aMY2TswjdRL5TCgoiYn', // App ID
+  'seWfZTgOwdVIbf4fRg1VqTDuUpTCxr8Rt8ub3wgh'  // JavaScript Key
 );
 
-(Parse as any).serverURL = 'https://parseapi.back4app.com';
+Parse.serverURL = 'https://parseapi.back4app.com';
 
 export default Parse;
